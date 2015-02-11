@@ -80,7 +80,7 @@ output: ioslides_presentation
  Common [arguments](https://docs.docker.com/reference/run/) for `docker run`:
 ----------------------------------------------------------------------------
 
-                     |
+  Argument           |  Explanation
   ------------------ | ----------------------    
   -i                 | Interactive (usually used with -t)
   -t                 | Give a terminal interface for a CLI
@@ -104,7 +104,7 @@ output: ioslides_presentation
  [Interacting with docker at the command line](https://docs.docker.com/reference/commandline/cli/)
 -----------------------------------------------  
 
-                                              |  
+   Command                                    |  Explanation
   ------------------------------------------- | ----------------------------------    
   `docker ps`                                 | list all the running containers on the host
   `docker ps -a`                              | list all the containers on the host, including those that have stopped
@@ -116,7 +116,7 @@ output: ioslides_presentation
  [Interacting with docker at the command line](https://docs.docker.com/reference/commandline/cli/)
 ----------------------------------------------- 
 
-                                             |
+   Command                                   |  Explanation                                          
   ------------------------------------------ | -----------------------------------    
   `docker rm <container-id>`                 | removes (deletes) a container
   `docker rmi <container-id>`                | removes (deletes) an image
