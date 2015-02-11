@@ -80,7 +80,7 @@ output: ioslides_presentation
  Common [arguments](https://docs.docker.com/reference/run/) for `docker run`:
 ----------------------------------------------------------------------------
 
-  ------------------ | ----------------------
+  ------------------ | ----------------------    
   -i                 | Interactive (usually used with -t)
   -t                 | Give a terminal interface for a CLI
   -p                 | Publish Ports: `-p <host port>:<container port>`
@@ -103,7 +103,7 @@ output: ioslides_presentation
  [Interacting with docker at the command line](https://docs.docker.com/reference/commandline/cli/)
 -----------------------------------------------  
 
-  ------------------------------------------- | ----------------------------------
+  ------------------------------------------- | ----------------------------------    
   `docker ps`                                 | list all the running containers on the host
   `docker ps -a`                              | list all the containers on the host, including those that have stopped
   `docker exec -it <container-id> bash`       | opens bash shell for a currently running container
@@ -114,7 +114,7 @@ output: ioslides_presentation
  [Interacting with docker at the command line](https://docs.docker.com/reference/commandline/cli/)
 -----------------------------------------------  
 
-  ------------------------------------------ | -----------------------------------
+  ------------------------------------------ | -----------------------------------    
   `docker rm <container-id>`                 | removes (deletes) a container
   `docker rmi <container-id>`                | removes (deletes) an image
   `docker rm -f $(docker ps -a -q)`          | remove all current containers
