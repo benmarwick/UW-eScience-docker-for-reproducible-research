@@ -1,0 +1,253 @@
+---
+title: "Reproducible Research using Docker and R"
+output: ioslides_presentation
+---
+
+ Motives for using Docker
+------------------------
+
+-   Difficulty of managing dependencies
+-   Maximizing isolation and transparency
+-   Portability of computational environment
+-   Make extendibility and reuse easy
+-   Ease of use generally
+
+ Limitations of VMs
+------------------
+
+-   **Size**: VMs are large files which makes them impractical to store
+    and transfer
+-   **Performance**: running VMs consumes significant CPU and memory
+
+ VM vs Docker
+--------------
+
+<img src="figures/contvsvm.png " alt="Drawing" style="width: 800px;"/>
+
+
+
+ What Docker is
+--------------
+
+-   A shipping container for the online universe: hardware-agnostic and
+    platform-agnostic
+-   A tool that lets programmers neatly package software and move it
+    from machine to machine.
+-   Released as open source in March 2013, a big deal on github: 18.6k
+    stars, 3.8k forks
+    
+
+
+
+ Basic ingredients
+-----------------
+
+-   **[dockerfiles](https://docs.docker.com/reference/builder/)**:
+    plain-text instructions to automatically make images
+-   **containers**: the active, running parts of Docker that do
+    something
+-   **images**: pre-built environments and instructions that tell a
+    container what to do.
+-   **registry**: [open online repository of
+    images](https://registry.hub.docker.com/), including many ['trusted
+    builds'](http://dockerfile.github.io/)
+
+ Docker's limitations
+--------------------
+
+-   Security: it is possible for a hosted image to be written with some
+    malicious intent
+-   Limited to 64-bit host machines, making it impossible to run on
+    older hardware
+-   Does not provide complete virtualization but relies on the Linux
+    kernel provided by the host
+-   On OSX and Windows this means a VM must be present
+    ([boot2docker](http://boot2docker.io/) installs
+    [VirtualBox](https://www.virtualbox.org/) for this)
+
+ Getting started on OSX & Windows
+--------------------------------
+
+-   Install & start [boot2docker](http://boot2docker.io/)
+-   `docker pull <username>/<image_name>` gets an existing image from
+    registry
+-   eg. `docker pull ubuntu` notice there's no username here, because
+    this is an 'official repo'
+-   after `docker pull` then `docker run`
+-   or simply `docker run`, which will `pull`, `create` and `run` in one
+    step
+
+ Common [arguments](https://docs.docker.com/reference/run/) for `docker run`:
+----------------------------------------------------------------------------
+
+  ------------------ ----------------------
+  -i                 Interactive (usually used with -t)
+  -t                 Give a terminal interface for a CLI
+  -p                 Publish Ports: `-p <host port>:<container port>`
+  -d                 Detached mode: run the container in the background (opposite of -i -t)
+  -v                 Mount a volume from inside your container (that has been specified with the VOLUME instruction in the Dockerfile)
+  -rm=true           Remove your container from the host when it stops running (only available with -it)
+  ------------------ --------------------
+
+
+ Examples of `docker run`
+------------------------
+
+-   `docker run -it ubuntu`
+-   gets ubuntu and gives us a terminal for interaction
+-   `docker run -dp 8787:8787 rocker/rstudio`
+-   gets R & RStudio and opens port 8787 for using RStudio server in a
+    web browser at localhost:8787 (linux) or 192.168.59.103:8787
+    (Windows, OSX)
+
+ [Interacting with docker at the command line](https://docs.docker.com/reference/commandline/cli/)
+-----------------------------------------------  
+
+  ------------------------------------------- ----------------------------------
+  `docker ps`                                 list all the running containers on the host
+  `docker ps -a`                              list all the containers on the host, including those that have stopped
+  `docker exec -it <container-id> bash`       opens bash shell for a currently running container
+  `docker stop <container-id>`                stop a running container
+  `docker kill <container-id>`                force stop a running container
+  ------------------------------------------ -----------------------------------
+  
+ [Interacting with docker at the command line](https://docs.docker.com/reference/commandline/cli/)
+-----------------------------------------------  
+
+  ------------------------------------------ -----------------------------------
+  `docker rm <container-id>`                  removes (deletes) a container
+  `docker rmi <container-id>`                 removes (deletes) an image
+  `docker rm -f $(docker ps -a -q)`           remove all current containers
+  `docker rmi -f $(docker images -q)`         remove all images, even those not in use
+  ------------------------------------------ -----------------------------------
+  
+
+
+ [Writing a Dockerfile](https://docs.docker.com/articles/dockerfile_best-practices/)
+-----------------------------------------------------------------------------------
+
+-   It is possible to use `docker commit <container>` to commit a
+    container's file changes or settings into a new image
+-   But it is better to use Dockerfiles & git to manage your images in a
+    documented and maintainable way
+-   A Dockerfile is a short plain text file that is a recipie for making
+    a docker image
+
+ Some common Dockerfile elements
+-------------------------------
+
+-   FROM specifies which base image your image is built on
+    (ultimately back to Debian)
+-   MAINTAINER specifies who created and maintains the
+    image.
+-   CMD specifies the command to run immediately when a container is
+    started from this image, unless you specify a different command.
+-   ADD will copy new files from a source and add them to
+    the containers filesystem path
+-   RUN does just that: It runs a command inside the
+    container (eg. `apt-get`)
+-   EXPOSE tells Docker that the container will listen on
+    the specified port when it starts
+-   VOLUME will create a mount point with the specified name
+    and tell Docker that the volume may be mounted by the host
+
+ Using Dockerfiles
+-----------------
+
+-   To build an image from a dockerfile:
+    `docker build --rm -t <username>/<image_name> <dockerfile>`
+-   [simple](https://github.com/benmarwick/1989-excavation-report-Madjebebe/blob/master/Dockerfile)
+    and [moderately
+    complex](https://github.com/rocker-org/hadleyverse/blob/master/Dockerfile)
+    examples
+-   To send an image to the registry:
+    `docker push <username>/<image_name>` You need to be registered at
+    the [hub](https://hub.docker.com/) bfore pushing
+
+ [Automated Docker image build testing](https://circleci.com/)
+-------------------------------------------------------------
+
+-   Automated image build testing on a new commit to the Dockerfile
+-   Analogous to the travis-ci service, has a shield
+-   Requires a `.circle.yml` file in github repo, eg.
+    [https://github.com/benmarwick/1989-excavation-report-Madjebebe/blob/master/circle.yml](https://github.com/benmarwick/1989-excavation-report-Madjebebe/blob/master/circle.yml)
+-   Pushes new image to hub on successful complete of test
+-   And gives a
+    [badge](https://github.com/benmarwick/1989-excavation-report-Madjebebe)
+    to indicate [test
+    status](https://circleci.com/gh/benmarwick/1989-excavation-report-Madjebebe)
+
+ Doing research with RStudio and Docker
+--------------------------------------
+
+-   The [rocker project](https://github.com/rocker-org/) provides images
+    that include R, key packages and other dependencies (RStudio,
+    pandoc, LaTeX, etc.), and has excellent documentation on the [github
+    wiki](https://github.com/rocker-org/rocker/wiki/Using-the-RStudio-image)
+-   I run RStudio server in the browser, with host folder as volume,
+    very easy to use
+-   I store scripts on host volume because VC is simpler this way, but
+    do development and analysis in container for isolation
+
+ I get started with... 
+--------------------------------------
+
+`docker run -dp 8787:8787 -v /c/Users/marwick/docker:/home/rstudio/ -e ROOT=TRUE rocker/hadleyverse`
+
+-   `-dp 8787:8787` gives me a port for the web browser to access
+    RStudio
+-   `-v /c/Users/marwick/docker:/home/rstudio/` gives me read and write
+    access both ways between Windows (C:/Users/marwick/docker) and
+    RStudio
+-   `-e ROOT=TRUE` sets an environment variable to enable root access
+    for me so I can manage dependencies
+-   I can access the docker (Debian) shell via RStudio for file
+    manipulation, etc. (or `docker exec -it <container-id> bash`)
+
+ ...and IPython
+------------
+
+-   Choose your favourite from the
+    [registry](https://registry.hub.docker.com/search?q=ipython&s=downloads)
+-   the IPython project have a few images, and there are many
+    user-contributed ones
+
+ Cloud computing with Docker is widely supported
+-----------------------------------------------
+
+-   Amazon EC2 Container Service: docker clusters in the cloud (no
+    registry)
+-   Google Compute Engine: has container-optimized VMs
+-   Google container registry: secure private docker image storage on
+    google cloud platform
+-   Microsoft Azure supports docker containers (docker hub is
+    integrated)
+
+ References & further reading
+----------------------------
+
+-   [http://arxiv-web3.library.cornell.edu/pdf/1410.0846v1.pdf](http://arxiv-web3.library.cornell.edu/pdf/1410.0846v1.pdf)
+-   [http://sites.duke.edu/researchcomputing/tag/docker/](http://sites.duke.edu/researchcomputing/tag/docker/)
+-   [https://rc.duke.edu/duke-docker-day-was-great/](https://rc.duke.edu/duke-docker-day-was-great/)
+-   [https://github.com/LinuxAtDuke/Intro-To-Docker](https://github.com/LinuxAtDuke/Intro-To-Docker)
+-   [http://reproducible-research.github.io/scipy-tutorial-2014/environment/docker/](http://reproducible-research.github.io/scipy-tutorial-2014/environment/docker/)
+-   [http://ropensci.org/blog/2014/10/23/introducing-rocker/](http://ropensci.org/blog/2014/10/23/introducing-rocker/)
+-   [https://github.com/wsargent/docker-cheat-sheet](https://github.com/wsargent/docker-cheat-sheet)
+
+ Colophon
+-------------------------
+
+Presentation written in [R Markdown using ioslides](http://rmarkdown.rstudio.com/ioslides_presentation_format.html)
+
+Compiled into HTML5 using [RStudio](http://www.rstudio.com/ide/) & [knitr](http://yihui.name/knitr/)
+
+Source code hosting:
+https://github.com/benmarwick/UW-eScience-docker-for-reproducibility
+
+ORCID: http://orcid.org/0000-0001-7879-4531
+
+Licensing: 
+
+* Presentation: [CC-BY-3.0](http://creativecommons.org/licenses/by/3.0/us/)
+
+* Source code: [MIT](http://opensource.org/licenses/MIT) 
